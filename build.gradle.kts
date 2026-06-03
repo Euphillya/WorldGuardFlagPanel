@@ -1,6 +1,16 @@
 plugins {
     id("java-library")
     id("xyz.jpenilla.run-paper") version "3.0.2"
+//    id("com.modrinth.minotaur") version "2.9.0"
+}
+
+val runNumber = System.getenv("GITHUB_RUN_NUMBER")
+version = if (runNumber != null) {
+    "3.0-$runNumber"
+} else {
+    providers.exec {
+        commandLine("git", "rev-parse", "--short", "HEAD")
+    }.standardOutput.asText.map { "3.0-${it.trim().ifBlank { "nogit" }}" }.get()
 }
 
 repositories {
@@ -45,3 +55,38 @@ tasks {
         }
     }
 }
+
+//modrinth {
+//    token.set(System.getenv("MODRINTH_TOKEN"))
+//    projectId.set("WorldGuardFlagPanel")
+//
+//    versionNumber.set(project.version.toString())
+//    versionName.set("WorldGuardFlagPanel ${project.version}")
+//
+//    changelog.set(
+//        System.getenv("commit_msg")
+//            ?: "Automatic build from GitHub Actions."
+//    )
+//
+//    uploadFile.set(tasks.named("build"))
+//
+//    debugMode.set(false)
+//
+//    gameVersions.addAll(
+//        "1.21.8",
+//        "1.21.9",
+//        "1.21.10",
+//        "1.21.11",
+//        "26.1",
+//        "26.1.1",
+//        "26.1.2"
+//    )
+//
+//    loaders.addAll("folia", "paper", "purpur")
+//
+//    versionType.set("release")
+//}
+//
+//tasks.modrinth {
+//    dependsOn(tasks.build)
+//}
