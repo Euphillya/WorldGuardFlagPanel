@@ -1,0 +1,27 @@
+name: WorldGuardFlagPanel
+version: '${version}'
+
+main: fr.euphyllia.worldguardflagpanel.WorldGuardFlagPanel
+loader: fr.euphyllia.worldguardflagpanel.WorldGuardFlagPanelLoader
+api-version: '1.21.8'
+load: POSTWORLD
+authors:
+  - Euphyllia
+
+folia-supported: true
+
+permissions:
+  worldguardflagpanel.use:
+    description: "Allows you to open the WGFlagPanel"
+    default: op
+  worldguardflagpanel.admin:
+    description: "Complete access (all regions)"
+    default: op
+
+
+dependencies:
+  server:
+    WorldGuard:
+      load: BEFORE
+      required: true
+      join-classpath: true

@@ -1,0 +1,43 @@
+prefix = "<gold>[WorldGuardFlagPanel]</gold>"
+
+# /wgfpanel command
+command.players-only = "<red>This command is for players only.</red>"
+command.no-permission = "<red>Insufficient permission.</red>"
+command.no-region-manager = "<red>Unable to access the region manager.</red>"
+command.region-not-found = "<red>Region not found: <region>.</red>"
+command.not-owner = "<red>You are not the owner of this region.</red>"
+command.no-region-here = "<yellow>You are not in any region. Specify one: /wgfpanel <region></yellow>"
+
+# Panel
+panel.title = "<gold>⚙ WGFlagPanel</gold>"
+panel.region-label = "<gray>Region: </gray><aqua><bold><region></bold></aqua>"
+panel.instruction = "<gray>Click a flag to toggle its value.</gray>"
+panel.close-button = "✕ Close"
+
+# Region selector
+selector.title = "<gold>Choose a region</gold>"
+selector.instruction = "<gray>Select a region to edit.</gray>"
+selector.all-regions = "<gray>All regions in the world.</gray>"
+selector.cancel-button = "Cancel"
+
+
+# Edit dialog
+edit.title = "<gold>Edit: <flag></gold>"
+edit.current-value = "<gray>Current value: </gray><aqua><value></aqua>"
+edit.hint-empty = "<gray>Leave empty to remove the flag.</gray>"
+edit.input-label = "New value"
+edit.confirm-button = "✔ Confirm"
+edit.cancel-button = "✕ Cancel"
+edit.hint-set = "<gray>One value per line. Empty = remove the flag.</gray>"
+edit.hint-gamemode = "<gray>Values: survival, creative, adventure, spectator</gray>"
+edit.hint-location = "<gray>Format : x,y,z or x,y,z,world. Empty = remove.</gray>"
+
+# Chat notifications
+notify.flag-changed = "<region> › <flag> = <value>"
+notify.flag-removed = "<region> › <flag> removed"
+notify.other-player-changed = "<aqua><player></aqua> <white>changed</white> <yellow><region> › <flag></yellow> <white>= <value></white>"
+notify.invalid-value = "<red>Invalid value: <error></red>"
+notify.error-read = "<red>Error reading the value.</red>"
+notify.error-no-view = "<red>Error: no value received.</red>"
+notify.region-not-found = "<red>Region not found: <region></red>"
+notify.flag-no-permission = "<red>You do not have permission to modify this flag.</red>"

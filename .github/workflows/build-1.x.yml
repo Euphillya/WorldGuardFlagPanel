@@ -1,0 +1,79 @@
+name: Build WorldGuardFlagPanel
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: "!contains(github.event.commits[0].message, '[ci-skip]')"
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          cache: "gradle"
+          distribution: "temurin"
+
+      - name: Configure Git User
+        run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+
+      - name: Permission gradlew
+        run: chmod +x gradlew
+
+      - name: Build jar
+        run: ./gradlew build
+
+      - name: Collect jars
+        run: |
+          mkdir -p release
+          cp build/libs/*.jar release/ || true
+          rm -f release/*-javadoc.jar release/*-sources.jar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorldGuardFlagPanel-Build
+          path: release/*.jar
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.tag }}
+          name: ${{ env.project_name }} - ${{ github.run_number }}
+          body: |
+            This release is automatically compiled by GitHub Actions
+            ### Commit Message
+            ${{ env.commit_msg }}
+          artifacts: release/*.jar
+          generateReleaseNotes: true
+          prerelease: ${{ env.pre }}
+          makeLatest: ${{ env.make_latest }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          replacesArtifacts: false
+
+      # U Modrinth publishing
+      # Requires:
+      #   - modrinth-publish (Minotaur) plugin added to build.gradle.kts
+      #   - MODRINTH_TOKEN secret set in repository settings
+      #   - modrinth { } block configured in build.gradle.kts (projectId, versionType, uploadFile, gameVersions, loaders...)
+      # - name: Publish to Modrinth
+      #   run: ./gradlew modrinth
+      #   env:
+      #     MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
+env:
+  tag: build-${{ github.run_number }}
+  project_name: WorldGuardFlagPanel
+  commit_id: ${{ github.sha }}
+  commit_msg: ${{ github.event.head_commit.message }}
+  pre: false
+  make_latest: true
+  # MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

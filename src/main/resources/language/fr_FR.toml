@@ -1,0 +1,43 @@
+prefix = "<gold>[WorldGuardFlagPanel]</gold>"
+
+# Commande /wgfpanel
+command.players-only = "<red>Cette commande est réservée aux joueurs.</red>"
+command.no-permission = "<red>Permission insuffisante.</red>"
+command.no-region-manager = "<red>Impossible d'accéder au gestionnaire de régions.</red>"
+command.region-not-found = "<red>Région introuvable : <region>.</red>"
+command.not-owner = "<red>Vous n'êtes pas propriétaire de cette région.</red>"
+command.no-region-here = "<yellow>Vous n'êtes dans aucune région. Précisez : /wgfpanel <région></yellow>"
+
+# Panel
+panel.title = "<gold>⚙ WGFlagPanel</gold>"
+panel.region-label = "<gray>Région : </gray><aqua><bold><region></bold></aqua>"
+panel.instruction = "<gray>Cliquez sur un flag pour changer sa valeur.</gray>"
+panel.close-button = "✕ Fermer"
+
+# Sélecteur de région
+selector.title = "<gold>Choisir une région</gold>"
+selector.instruction = "<gray>Select a region to edit.</gray>"
+selector.all-regions = "<gray>All regions in the world.</gray>"
+selector.cancel-button = "Annuler"
+
+
+# Dialog d'édition
+edit.title = "<gold>Modifier : <flag></gold>"
+edit.current-value = "<gray>Valeur actuelle : </gray><aqua><value></aqua>"
+edit.hint-empty = "<gray>Laissez vide pour supprimer le flag.</gray>"
+edit.input-label = "Nouvelle valeur"
+edit.confirm-button = "✔ Confirmer"
+edit.cancel-button = "✕ Annuler"
+edit.hint-set = "<gray>One value per line. Empty = remove the flag.</gray>"
+edit.hint-gamemode = "<gray>Valeurs : survival, creative, adventure, spectator</gray>"
+edit.hint-location = "<gray>Format : x,y,z ou x,y,z,monde. Vide = supprimer.</gray>"
+
+# Notifications chat
+notify.flag-changed = "<region> › <flag> = <value>"
+notify.flag-removed = "<region> › <flag> supprimé"
+notify.other-player-changed = "<aqua><player></aqua> <white>a modifié</white> <yellow><region> › <flag></yellow> <white>= <value></white>"
+notify.invalid-value = "<red>Valeur invalide : <error></red>"
+notify.error-read = "<red>Erreur lors de la lecture de la valeur.</red>"
+notify.error-no-view = "<red>Erreur : aucune valeur reçue.</red>"
+notify.region-not-found = "<red>Région introuvable : <region></red>"
+notify.flag-no-permission = "<red>Vous n'avez pas la permission de modifier ce flag.</red>"
