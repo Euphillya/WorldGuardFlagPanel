@@ -49,7 +49,6 @@ Instead of typing `/region flag <region> <flag> <value>` every time, simply open
 - Fully customizable via `.toml` files
 
 ### ⚡ Performance
-- **Folia-native** — Designed for the multi-threaded Folia scheduler
 - **Instant saves** — Region changes are persisted to disk immediately after each edit
 
 ---
