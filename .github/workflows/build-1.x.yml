@@ -59,15 +59,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           replacesArtifacts: false
 
-      # U Modrinth publishing
-      # Requires:
-      #   - modrinth-publish (Minotaur) plugin added to build.gradle.kts
-      #   - MODRINTH_TOKEN secret set in repository settings
-      #   - modrinth { } block configured in build.gradle.kts (projectId, versionType, uploadFile, gameVersions, loaders...)
-      # - name: Publish to Modrinth
-      #   run: ./gradlew modrinth
-      #   env:
-      #     MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      - name: Publish to Modrinth
+        run: ./gradlew modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
 env:
   tag: build-${{ github.run_number }}
@@ -76,4 +71,4 @@ env:
   commit_msg: ${{ github.event.head_commit.message }}
   pre: false
   make_latest: true
-  # MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+  MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

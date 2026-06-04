@@ -10,7 +10,7 @@
 [![WorldGuard](https://img.shields.io/badge/WorldGuard-7.0.13+-red.svg)](https://dev.enginehub.org/worldguard/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/Euphillya/WorldGuardFlagPanel)
 
-[GitHub](https://github.com/Euphillya/WorldGuardFlagPanel) • [Issues](https://github.com/Euphillya/WorldGuardFlagPanel/issues)  • [Modrinth](*) • [Discord](https://discord.gg/uUJQEB7XNN)
+[GitHub](https://github.com/Euphillya/WorldGuardFlagPanel) • [Issues](https://github.com/Euphillya/WorldGuardFlagPanel/issues)  • [Modrinth](https://modrinth.com/plugin/worldguardflagpanel) • [Discord](https://discord.gg/uUJQEB7XNN)
 
 [![Servers & Players](https://faststats.dev/embed/default:83f973ef-4bbd-4059-b386-4b08cdbac339:servers-and-players.svg?w=960&h=340&theme=dark)](https://faststats.dev/project/worldguardflagpanel/minecraft-plugin)
 
