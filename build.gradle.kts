@@ -6,11 +6,11 @@ plugins {
 
 val runNumber = System.getenv("GITHUB_RUN_NUMBER")
 version = if (runNumber != null) {
-    "3.0-$runNumber"
+    "1.0-$runNumber"
 } else {
     providers.exec {
         commandLine("git", "rev-parse", "--short", "HEAD")
-    }.standardOutput.asText.map { "3.0-${it.trim().ifBlank { "nogit" }}" }.get()
+    }.standardOutput.asText.map { "1.0-${it.trim().ifBlank { "nogit" }}" }.get()
 }
 
 repositories {
