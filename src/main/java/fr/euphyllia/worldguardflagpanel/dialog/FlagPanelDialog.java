@@ -46,14 +46,17 @@ public class FlagPanelDialog {
                     .action(DialogAction.customClick(key, null))
                     .width(200).build());
         }
+        Key cancelKey = Key.key(NS, "close");
         buttons.add(ActionButton.builder(lang.translateRaw(player, "selector.cancel-button", Map.of()))
-                .action(null).width(100).build());
+                .action(DialogAction.customClick(cancelKey, null)).width(100).build());
 
         Dialog dialog = Dialog.create(builder -> builder.empty()
                 .base(DialogBase.builder(lang.translateRaw(player, "selector.title", Map.of()))
                         .body(List.of(DialogBody.plainMessage(
                                 lang.translateRaw(player, "selector.instruction", Map.of()))))
                         .canCloseWithEscape(true)
+                        .pause(false)
+                        .afterAction(DialogBase.DialogAfterAction.NONE)
                         .build())
                 .type(DialogType.multiAction(buttons).build()));
 
@@ -61,11 +64,22 @@ public class FlagPanelDialog {
     }
 
     public static void openFlagPanel(Player player, ProtectedRegion region) {
+        openFlagPanel(player, region, 0);
+    }
+
+    public static void openFlagPanel(Player player, ProtectedRegion region, int page) {
         LanguageManager lang = LanguageManager.getInstance();
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
 
         List<Flag<?>> flags = new ArrayList<>(registry.getAll());
         flags.sort(Comparator.comparing(Flag::getName));
+
+        final int PAGE_SIZE = 22;
+        int totalPages = Math.max(1, (int) Math.ceil((double) flags.size() / PAGE_SIZE));
+        page = Math.clamp(page, 0, totalPages - 1);
+        int start = page * PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, flags.size());
+        List<Flag<?>> pageFlags = flags.subList(start, end);
 
         List<DialogBody> body = new ArrayList<>();
         body.add(DialogBody.plainMessage(
@@ -75,30 +89,74 @@ public class FlagPanelDialog {
                 lang.translateRaw(player, "panel.instruction", Map.of())));
 
         List<ActionButton> buttons = new ArrayList<>();
-        for (Flag<?> flag : flags) {
+        for (Flag<?> flag : pageFlags) {
             Object value = region.getFlag(flag);
             Component label = buildFlagLabel(flag, value);
-            Key key = buildActionKey(flag, value, region);
+            Key key = buildActionKey(flag, value, region, page);
 
             ActionButton.Builder btn = ActionButton.builder(label).width(280);
             if (key != null) btn.action(DialogAction.customClick(key, null));
             buttons.add(btn.build());
         }
 
-        buttons.add(ActionButton.builder(lang.translateRaw(player, "panel.close-button", Map.of()))
-                .action(null).width(100).build());
+        if (totalPages > 1) {
+            if (buttons.size() % 2 != 0) {
+                buttons.add(ActionButton.builder(Component.text(" ")).width(280).build());
+            }
+
+            String prevText = lang.raw(player, "panel.prev-button");
+            if (prevText == null || prevText.startsWith("<red>Missing")) prevText = "◀ Previous";
+            String nextText = lang.raw(player, "panel.next-button");
+            if (nextText == null || nextText.startsWith("<red>Missing")) nextText = "Next ▶";
+
+            Component prevLabel = Component.text(prevText, page > 0 ? COLOR_ACCENT : NamedTextColor.DARK_GRAY);
+            ActionButton.Builder prevBtn = ActionButton.builder(prevLabel).width(280);
+            if (page > 0) {
+                Key prevKey = Key.key(NS, "page/" + region.getId() + "/" + (page - 1));
+                prevBtn.action(DialogAction.customClick(prevKey, null));
+            }
+            buttons.add(prevBtn.build());
+
+            Component nextLabel = Component.text(nextText, page < totalPages - 1 ? COLOR_ACCENT : NamedTextColor.DARK_GRAY);
+            ActionButton.Builder nextBtn = ActionButton.builder(nextLabel).width(280);
+            if (page < totalPages - 1) {
+                Key nextKey = Key.key(NS, "page/" + region.getId() + "/" + (page + 1));
+                nextBtn.action(DialogAction.customClick(nextKey, null));
+            }
+            buttons.add(nextBtn.build());
+        }
+
+        Key closeKey = Key.key(NS, "close");
+        ActionButton closeBtn = ActionButton.builder(lang.translateRaw(player, "panel.close-button", Map.of()))
+                .action(DialogAction.customClick(closeKey, null))
+                .width(100)
+                .build();
+
+        Component baseTitle = lang.translateRaw(player, "panel.title", Map.of());
+        final Component finalTitle = totalPages > 1
+                ? baseTitle.append(Component.text(" (" + (page + 1) + "/" + totalPages + ")", NamedTextColor.GRAY))
+                : baseTitle;
 
         Dialog dialog = Dialog.create(builder -> builder.empty()
-                .base(DialogBase.builder(lang.translateRaw(player, "panel.title", Map.of()))
+                .base(DialogBase.builder(finalTitle)
                         .body(body)
                         .canCloseWithEscape(true)
+                        .pause(false)
+                        .afterAction(DialogBase.DialogAfterAction.NONE)
                         .build())
-                .type(DialogType.multiAction(buttons).build()));
+                .type(DialogType.multiAction(buttons)
+                        .columns(2)
+                        .exitAction(closeBtn)
+                        .build()));
 
         player.showDialog(dialog);
     }
 
     public static void openEditDialog(Player player, ProtectedRegion region, Flag<?> flag) {
+        openEditDialog(player, region, flag, 0);
+    }
+
+    public static void openEditDialog(Player player, ProtectedRegion region, Flag<?> flag, int page) {
         LanguageManager lang = LanguageManager.getInstance();
         Object currentValue = region.getFlag(flag);
 
@@ -111,8 +169,8 @@ public class FlagPanelDialog {
             currentStr = currentValue != null ? currentValue.toString() : "";
         }
 
-        Key confirmKey = Key.key(NS, "confirm_edit/" + region.getId() + "/" + flag.getName());
-        Key backKey = Key.key(NS, "back/" + region.getId());
+        Key confirmKey = Key.key(NS, "confirm_edit/" + region.getId() + "/" + flag.getName() + "/" + page);
+        Key backKey = Key.key(NS, "back/" + region.getId() + "/" + page);
 
         boolean isSet = flag instanceof SetFlag<?>;
         String inputKey = flag.getName().replace("-", "_");
@@ -136,6 +194,8 @@ public class FlagPanelDialog {
                         ))
                         .inputs(List.of(inputBuilder.build()))
                         .canCloseWithEscape(true)
+                        .pause(false)
+                        .afterAction(DialogBase.DialogAfterAction.NONE)
                         .build())
                 .type(DialogType.confirmation(
                         ActionButton.builder(lang.translateRaw(player, "edit.confirm-button", Map.of()))
@@ -148,6 +208,10 @@ public class FlagPanelDialog {
     }
 
     public static void openGameModeDialog(Player player, ProtectedRegion region, Flag<?> flag) {
+        openGameModeDialog(player, region, flag, 0);
+    }
+
+    public static void openGameModeDialog(Player player, ProtectedRegion region, Flag<?> flag, int page) {
         LanguageManager lang = LanguageManager.getInstance();
         Object currentValue = region.getFlag(flag);
         String currentStr = currentValue != null ? currentValue.toString().toLowerCase() : "";
@@ -162,8 +226,8 @@ public class FlagPanelDialog {
                 ))
                 .toList();
 
-        Key confirmKey = Key.key(NS, "confirm_gamemode/" + region.getId() + "/" + flag.getName());
-        Key backKey = Key.key(NS, "back/" + region.getId());
+        Key confirmKey = Key.key(NS, "confirm_gamemode/" + region.getId() + "/" + flag.getName() + "/" + page);
+        Key backKey = Key.key(NS, "back/" + region.getId() + "/" + page);
 
         Dialog dialog = Dialog.create(builder -> builder.empty()
                 .base(DialogBase.builder(
@@ -180,6 +244,8 @@ public class FlagPanelDialog {
                                 ).width(300).build()
                         ))
                         .canCloseWithEscape(true)
+                        .pause(false)
+                        .afterAction(DialogBase.DialogAfterAction.NONE)
                         .build())
                 .type(DialogType.confirmation(
                         ActionButton.builder(lang.translateRaw(player, "edit.confirm-button", Map.of()))
@@ -211,28 +277,32 @@ public class FlagPanelDialog {
     }
 
     private static Key buildActionKey(Flag<?> flag, Object value, ProtectedRegion region) {
+        return buildActionKey(flag, value, region, 0);
+    }
+
+    private static Key buildActionKey(Flag<?> flag, Object value, ProtectedRegion region, int page) {
         String base = region.getId() + "/" + flag.getName();
         switch (flag) {
             case StateFlag stateFlag -> {
                 String next = nextStateStr((StateFlag.State) value);
-                return Key.key(NS, "set_state/" + base + "/" + next);
+                return Key.key(NS, "set_state/" + base + "/" + next + "/" + page);
             }
             case BooleanFlag booleanFlag -> {
                 boolean next = !Boolean.TRUE.equals(value);
-                return Key.key(NS, "set_bool/" + base + "/" + next);
+                return Key.key(NS, "set_bool/" + base + "/" + next + "/" + page);
             }
             default -> {
             }
         }
         if (flag instanceof StringFlag || flag instanceof IntegerFlag || flag instanceof DoubleFlag
                 || flag instanceof SetFlag<?> || flag instanceof LocationFlag) {
-            return Key.key(NS, "edit_flag/" + base);
+            return Key.key(NS, "edit_flag/" + base + "/" + page);
         }
         if (flag instanceof RegistryFlag<?>) {
             if (flag.getName().equals("game-mode")) {
-                return Key.key(NS, "set_gamemode/" + base);
+                return Key.key(NS, "set_gamemode/" + base + "/" + page);
             }
-            return Key.key(NS, "edit_flag/" + base);
+            return Key.key(NS, "edit_flag/" + base + "/" + page);
         }
         log.error("Unsupported flag type for editing: {} ({}), defaulting to no action", flag.getClass().getName(), flag.getName());
         return null;
