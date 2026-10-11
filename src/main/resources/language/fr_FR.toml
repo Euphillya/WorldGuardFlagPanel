@@ -13,6 +13,8 @@ panel.title = "<gold>⚙ WGFlagPanel</gold>"
 panel.region-label = "<gray>Région : </gray><aqua><bold><region></bold></aqua>"
 panel.instruction = "<gray>Cliquez sur un flag pour changer sa valeur.</gray>"
 panel.close-button = "✕ Fermer"
+panel.prev-button = "◀ Précédent"
+panel.next-button = "Suivant ▶"
 
 # Sélecteur de région
 selector.title = "<gold>Choisir une région</gold>"

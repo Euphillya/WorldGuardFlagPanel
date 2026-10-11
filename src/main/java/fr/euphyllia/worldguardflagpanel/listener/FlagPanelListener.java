@@ -48,6 +48,10 @@ public class FlagPanelListener implements Listener {
         String action = parts[0];
 
         switch (action) {
+            case "close" -> {
+                player.closeDialog();
+            }
+
             case "select_region", "back" -> {
                 if (parts.length < 2) return;
                 ProtectedRegion region = getRegion(player, parts[1]);
@@ -55,7 +59,19 @@ public class FlagPanelListener implements Listener {
                     notFound(player, parts[1]);
                     return;
                 }
-                FlagPanelDialog.openFlagPanel(player, region);
+                int page = parts.length > 2 ? parseIntOrDefault(parts[2], 0) : 0;
+                FlagPanelDialog.openFlagPanel(player, region, page);
+            }
+
+            case "page" -> {
+                if (parts.length < 3) return;
+                ProtectedRegion region = getRegion(player, parts[1]);
+                if (region == null) {
+                    notFound(player, parts[1]);
+                    return;
+                }
+                int page = parseIntOrDefault(parts[2], 0);
+                FlagPanelDialog.openFlagPanel(player, region, page);
             }
 
             case "set_state" -> {
@@ -70,10 +86,11 @@ public class FlagPanelListener implements Listener {
                     return;
                 }
 
+                int page = parts.length > 4 ? parseIntOrDefault(parts[4], 0) : 0;
                 if (WGUtil.applyStateFlag(player, region, parts[2], parts[3])) {
                     notifyChange(player, region, parts[2],
                             parts[3].equals("null") ? "unset" : parts[3].toUpperCase());
-                    FlagPanelDialog.openFlagPanel(player, region);
+                    FlagPanelDialog.openFlagPanel(player, region, page);
                 }
             }
 
@@ -89,10 +106,11 @@ public class FlagPanelListener implements Listener {
                     return;
                 }
 
+                int page = parts.length > 4 ? parseIntOrDefault(parts[4], 0) : 0;
                 boolean newVal = Boolean.parseBoolean(parts[3]);
                 if (WGUtil.applyBooleanFlag(player, region, parts[2], newVal)) {
                     notifyChange(player, region, parts[2], String.valueOf(newVal));
-                    FlagPanelDialog.openFlagPanel(player, region);
+                    FlagPanelDialog.openFlagPanel(player, region, page);
                 }
             }
 
@@ -111,7 +129,8 @@ public class FlagPanelListener implements Listener {
                 FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
                 Flag<?> flag = registry.get(parts[2]);
                 if (flag == null) return;
-                FlagPanelDialog.openEditDialog(player, region, flag);
+                int page = parts.length > 3 ? parseIntOrDefault(parts[3], 0) : 0;
+                FlagPanelDialog.openEditDialog(player, region, flag, page);
             }
 
             case "confirm_edit" -> {
@@ -144,6 +163,7 @@ public class FlagPanelListener implements Listener {
                 Flag<?> flag = registry.get(parts[2]);
                 if (flag == null) return;
 
+                int page = parts.length > 3 ? parseIntOrDefault(parts[3], 0) : 0;
 
                 if (rawInput == null || rawInput.isBlank()) {
                     region.setFlag(flag, null);
@@ -167,7 +187,7 @@ public class FlagPanelListener implements Listener {
                     notifyChange(player, region, parts[2], rawInput);
                 }
 
-                FlagPanelDialog.openFlagPanel(player, region);
+                FlagPanelDialog.openFlagPanel(player, region, page);
             }
 
             case "set_gamemode" -> {
@@ -185,7 +205,8 @@ public class FlagPanelListener implements Listener {
                 FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
                 Flag<?> flag = registry.get(parts[2]);
                 if (flag == null) return;
-                FlagPanelDialog.openGameModeDialog(player, region, flag);
+                int page = parts.length > 3 ? parseIntOrDefault(parts[3], 0) : 0;
+                FlagPanelDialog.openGameModeDialog(player, region, flag, page);
             }
 
             case "confirm_gamemode" -> {
@@ -212,6 +233,8 @@ public class FlagPanelListener implements Listener {
                 Flag<?> flag = registry.get(parts[2]);
                 if (flag == null) return;
 
+                int page = parts.length > 3 ? parseIntOrDefault(parts[3], 0) : 0;
+
                 if (selected == null || selected.isBlank()) {
                     region.setFlag(flag, null);
                     WGUtil.saveRegion(player, region);
@@ -221,9 +244,17 @@ public class FlagPanelListener implements Listener {
                     notifyChange(player, region, parts[2], selected);
                 }
 
-                FlagPanelDialog.openFlagPanel(player, region);
+                FlagPanelDialog.openFlagPanel(player, region, page);
             }
 
+        }
+    }
+
+    private int parseIntOrDefault(String str, int def) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return def;
         }
     }
 
